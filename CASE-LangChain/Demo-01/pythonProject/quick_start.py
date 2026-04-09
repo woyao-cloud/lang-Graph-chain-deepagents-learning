@@ -1,17 +1,24 @@
 import os
+from typing import List
 
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 
-api_key = os.getenv("OPENAI_API_KEY", "sk-723b202be3804cd89fef3970bc92675f")
-api_base = os.getenv("OPENAI_API_BASE", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+# Configuration (environment-overridable)
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+MODEL_NAME = "ollama"
+#os.getenv("MODEL_NAME", "minimax-m2.7:cloud")
+TEMPERATURE = float(os.getenv("TEMPERATURE", "0"))
 
-model = init_chat_model(
-    api_key=api_key,
-    base_url=api_base,    # 指向 DashScope 的 OpenAI 兼容 URL
-    model_provider="qwen-max",     # 或 "qwen-turbo" / 您有权限的模型名
-    temperature=0,
-)
+
+def create_model():
+    """Initialize and return a chat model backed by Ollama."""
+    return init_chat_model(
+        MODEL_NAME,
+        provider="ollama",
+        base_url=OLLAMA_URL,
+        temperature=TEMPERATURE,
+    )
 
 
 # Define tools
@@ -49,6 +56,18 @@ def divide(a: int, b: int) -> float:
 
 
 # Augment the LLM with tools
-tools = [add, multiply, divide]
-tools_by_name = {tool.name: tool for tool in tools}
-model_with_tools = model.bind_tools(tools)
+def get_tools() -> List:
+    return [add, multiply, divide]
+
+
+def main() -> None:
+    model = create_model()
+    tools = get_tools()
+    model_with_tools = model.bind_tools(tools)
+
+    print(f"Initialized model '{MODEL_NAME}' via Ollama at {OLLAMA_URL}")
+    print("Registered tools:", [t.name for t in tools])
+
+
+if __name__ == "__main__":
+    main()
