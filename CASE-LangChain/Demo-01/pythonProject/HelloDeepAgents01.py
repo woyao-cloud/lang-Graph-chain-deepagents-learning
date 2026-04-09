@@ -37,7 +37,7 @@ api_base = os.getenv("OPENAI_API_BASE", "https://dashscope.aliyuncs.com/compatib
 llm = ChatOpenAI(
     api_key=api_key,
     base_url=api_base,  # 指向 DashScope 的 OpenAI 兼容 URL
-    model="qwen-max",  # 或 "qwen-turbo" / 您有权限的模型名
+    model="deepseek-v3.2-exp",  # 或 "qwen-turbo" / 您有权限的模型名qwen3-max qwen-max deepseek-v3.2-exp
     temperature=0.2
 )
 
