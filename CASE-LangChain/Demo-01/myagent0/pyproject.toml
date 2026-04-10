@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "myagent"
 version = "0.1.0"
-description = "myagent Code Agent - 全自动化、可解释、可干预的工程级代码生成系统"
+description = "MyCodeAgent - 全自动化、可解释、可干预的工程级代码生成系统"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.0",
     "typer>=0.12",
-    "deepagent>=0.5.0",
+    "deepagents>=0.5.0",
     "langchain-openai>=1.0",
     "langchain-core>=0.3",
     "langgraph>=0.2",

@@ -33,7 +33,7 @@ source venv/bin/activate
 
 ```bash
 # 安装核心依赖
-pip install click typer deepagents langchain-openai langchain-core langgraph
+pip install click typer myagent langchain-openai langchain-core langgraph
 
 # 安装开发依赖（用于测试）
 pip install pytest pytest-cov
@@ -49,8 +49,8 @@ pip install -r requirements.txt
 python --version
 # 输出应类似: Python 3.11.x
 
-# 验证 deepagents 导入
-python -c "from deepagents import create_deep_agent; print('OK')"
+# 验证 myagent 导入
+python -c "from myagent import create_deep_agent; print('OK')"
 ```
 
 ---
@@ -60,11 +60,11 @@ python -c "from deepagents import create_deep_agent; print('OK')"
 ### 2.1 创建新项目
 
 ```bash
-# 使用 deepagents init 初始化项目
-python -m deepagents init --name my-project --dir ./my-project
+# 使用 myagent init 初始化项目
+python -m myagent init --name my-project --dir ./my-project
 
 # 或在当前目录初始化
-python -m deepagents init --name my-project
+python -m myagent init --name my-project
 ```
 
 ### 2.2 初始化的项目结构
@@ -90,31 +90,31 @@ my-project/
 
 ```bash
 # 查看帮助
-python -m deepagents --help
+python -m myagent --help
 
 # 初始化项目
-python -m deepagents init --name <project-name>
+python -m myagent init --name <project-name>
 
 # 运行工作流
-python -m deepagents run --phase plan       # 生成规划
-python -m deepagents run --phase execute     # 执行任务
+python -m myagent run --phase plan       # 生成规划
+python -m myagent run --phase execute     # 执行任务
 
 # 确认规划
-python -m deepagents confirm --file PLANNING.md
+python -m myagent confirm --file PLANNING.md
 
 # 查看状态
-python -m deepagents status                  # 查看状态
-python -m deepagents status --live           # 实时监控
+python -m myagent status                  # 查看状态
+python -m myagent status --live           # 实时监控
 
 # 查看日志
-python -m deepagents logs --agent architect  # 查看指定 Agent 日志
-python -m deepagents logs --agent backend-dev --follow
+python -m myagent logs --agent architect  # 查看指定 Agent 日志
+python -m myagent logs --agent backend-dev --follow
 
 # 人工干预
-python -m deepagents skip --task <task-name>        # 跳过任务
-python -m deepagents rollback --task <task-name>    # 回退任务
-python -m deepagents approve --operation <op-id>    # 批准危险操作
-python -m deepagents reject --operation <op-id>     # 拒绝危险操作
+python -m myagent skip --task <task-name>        # 跳过任务
+python -m myagent rollback --task <task-name>    # 回退任务
+python -m myagent approve --operation <op-id>    # 批准危险操作
+python -m myagent reject --operation <op-id>     # 拒绝危险操作
 ```
 
 ### 3.2 工作流配置 (workflow.md)
@@ -181,7 +181,7 @@ python -m deepagents reject --operation <op-id>     # 拒绝危险操作
             "name": "Python: Module",
             "type": "python",
             "request": "launch",
-            "module": "deepagents",
+            "module": "myagent",
             "args": ["run", "--phase", "plan"],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
@@ -190,7 +190,7 @@ python -m deepagents reject --operation <op-id>     # 拒绝危险操作
             "name": "Debug: Init Command",
             "type": "python",
             "request": "launch",
-            "module": "deepagents",
+            "module": "myagent",
             "args": ["init", "--name", "test-project"],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal"
@@ -204,8 +204,8 @@ python -m deepagents reject --operation <op-id>     # 拒绝危险操作
 1. **Run > Edit Configurations**
 2. **点击 + > Python**
 3. **配置:**
-   - Name: `deepagents run`
-   - Module name: `deepagents`
+   - Name: `myagent run`
+   - Module name: `myagent`
    - Parameters: `run --phase plan`
    - Working directory: 项目根目录
 
@@ -217,9 +217,9 @@ import pdb; pdb.set_trace()
 
 # 或使用 IDE 断点
 # 建议在以下位置设置断点:
-# - deepagents/workflow/parser.py: parse() 方法
-# - deepagents/scheduler/dispatcher.py: route() 方法
-# - deepagents/agents/supervisor.py: generate_planning() 方法
+# - myagent/workflow/parser.py: parse() 方法
+# - myagent/scheduler/dispatcher.py: route() 方法
+# - myagent/agents/supervisor.py: generate_planning() 方法
 ```
 
 ### 4.3 日志调试
@@ -230,8 +230,8 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # 或设置特定模块的日志级别
-logging.getLogger('deepagents.workflow').setLevel(logging.DEBUG)
-logging.getLogger('deepagents.scheduler').setLevel(logging.DEBUG)
+logging.getLogger('myagent.workflow').setLevel(logging.DEBUG)
+logging.getLogger('myagent.scheduler').setLevel(logging.DEBUG)
 ```
 
 ### 4.4 查看详细日志
@@ -250,8 +250,8 @@ tail -f LOGS/agents/backend-dev/*.log
 
 | 问题 | 可能原因 | 解决方法 |
 |------|----------|----------|
-| `ModuleNotFoundError: No module named 'deepagents'` | 未正确安装 | `pip install -e .` 或 `PYTHONPATH=.` |
-| `workflow.md not found` | 工作流文件不存在 | 先运行 `deepagents init` |
+| `ModuleNotFoundError: No module named 'myagent'` | 未正确安装 | `pip install -e .` 或 `PYTHONPATH=.` |
+| `workflow.md not found` | 工作流文件不存在 | 先运行 `myagent init` |
 | `Agent initialization failed` | API Key 未设置 | 设置环境变量 `OPENAI_API_KEY` |
 | `Permission denied` | 文件权限问题 | 检查项目目录权限 |
 | `Circular dependency detected` | workflow.md 配置错误 | 检查 Phase depends 配置 |
@@ -263,8 +263,8 @@ tail -f LOGS/agents/backend-dev/*.log
 ### 5.1 在 Python 代码中使用
 
 ```python
-from deepagents.workflow.parser import WorkflowParser
-from deepagents.workflow.dag import DAGBuilder
+from myagent.workflow.parser import WorkflowParser
+from myagent.workflow.dag import DAGBuilder
 
 # 解析工作流
 parser = WorkflowParser()
@@ -279,10 +279,10 @@ for node in sorted_nodes:
     print(f"{node.id}: {node.name}")
 ```
 
-### 5.2 使用 deepagents 框架创建 Agent
+### 5.2 使用 myagent 框架创建 Agent
 
 ```python
-from deepagents import create_deep_agent
+from myagent import create_deep_agent
 from langchain_openai import ChatOpenAI
 
 # 初始化 LLM
@@ -316,7 +316,7 @@ pytest tests/ -v
 pytest tests/test_workflow_parser.py -v
 
 # 运行并生成覆盖率报告
-pytest tests/ --cov=deepagents --cov-report=html
+pytest tests/ --cov=myagent --cov-report=html
 
 # 查看覆盖率报告
 open htmlcov/index.html
@@ -340,7 +340,7 @@ open htmlcov/index.html
 
 ```bash
 # 1. 初始化项目
-python -m deepagents init --name my-project
+python -m myagent init --name my-project
 
 # 2. 进入项目目录
 cd my-project
@@ -348,16 +348,16 @@ cd my-project
 # 3. 编辑 workflow.md 和 agent.md
 
 # 4. 生成规划
-python -m deepagents run --phase plan
+python -m myagent run --phase plan
 
 # 5. 确认规划（可编辑 PLANNING.md）
-python -m deepagents confirm --file PLANNING.md
+python -m myagent confirm --file PLANNING.md
 
 # 6. 执行
-python -m deepagents run --phase execute
+python -m myagent run --phase execute
 
 # 7. 查看状态
-python -m deepagents status --live
+python -m myagent status --live
 ```
 
 ---

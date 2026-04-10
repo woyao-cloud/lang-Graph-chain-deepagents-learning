@@ -22,8 +22,8 @@ class TestDAGBuilder:
 
     def test_build_dag_from_workflow(self):
         """测试从工作流构建 DAG"""
-        from deepagents.workflow.parser import WorkflowParser
-        from deepagents.workflow.dag import DAGBuilder
+        from myagent.workflow.parser import WorkflowParser
+        from myagent.workflow.dag import DAGBuilder
 
         content = """
 ## Phases
@@ -48,8 +48,8 @@ class TestDAGBuilder:
 
     def test_topological_sort(self):
         """测试拓扑排序"""
-        from deepagents.workflow.parser import WorkflowParser
-        from deepagents.workflow.dag import DAGBuilder
+        from myagent.workflow.parser import WorkflowParser
+        from myagent.workflow.dag import DAGBuilder
 
         content = """
 ## Phases
@@ -79,7 +79,7 @@ class TestProgressTracker:
 
     def test_track_phase_progress(self):
         """测试阶段进度追踪"""
-        from deepagents.state.progress import ProgressTracker
+        from myagent.state.progress import ProgressTracker
 
         tracker = ProgressTracker("test_project")
         tracker.set_total_phases(3)
@@ -88,7 +88,7 @@ class TestProgressTracker:
 
     def test_track_task_progress(self):
         """测试任务进度追踪"""
-        from deepagents.state.progress import ProgressTracker
+        from myagent.state.progress import ProgressTracker
 
         tracker = ProgressTracker("test_project")
         tracker.start_task("task1", "任务1", "backend-dev", "Phase 1")
@@ -101,7 +101,7 @@ class TestCheckpointManager:
 
     def test_save_and_load_checkpoint(self):
         """测试保存和加载检查点"""
-        from deepagents.state.checkpoint import CheckpointManager, WorkflowState, AgentState
+        from myagent.state.checkpoint import CheckpointManager, WorkflowState, AgentState
 
         with tempfile.TemporaryDirectory() as tmpdir:
             manager = CheckpointManager(tmpdir)

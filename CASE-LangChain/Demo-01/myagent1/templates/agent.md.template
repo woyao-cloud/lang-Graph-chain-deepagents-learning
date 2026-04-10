@@ -1,0 +1,15 @@
+# Agent Registry
+
+## Roles
+
+- architect: 负责架构设计、技术选型、PLANNING.md 生成与接口契约定义
+- backend-dev: 精通 Python/Go/Java，负责业务逻辑、API 与数据库设计
+- frontend-dev: 精通 Vue/React，负责 UI 组件、状态管理与路由
+- qa-engineer: 负责单元测试、集成测试用例生成与覆盖率校验
+
+## Routing Rules
+
+- 架构设计 -> architect (串行)
+- 核心模块 -> backend-dev + frontend-dev (并发)
+- 测试 -> qa-engineer (串行)
+- 部署 -> devops (串行)

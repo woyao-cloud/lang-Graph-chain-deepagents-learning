@@ -7,7 +7,7 @@ import pytest
 import tempfile
 import os
 
-from deepagents.tools.file_ops import FileOperations
+from myagent.tools.file_ops import FileOperations
 
 
 class TestFileOperations:
@@ -81,7 +81,7 @@ class TestCommandWhitelist:
 
     def test_allowed_commands(self):
         """测试允许的命令"""
-        from deepagents.tools.command import CommandWhitelist
+        from myagent.tools.command import CommandWhitelist
 
         # Python 命令应该允许
         is_allowed, needs_confirm = CommandWhitelist.is_allowed("python test.py")
@@ -93,7 +93,7 @@ class TestCommandWhitelist:
 
     def test_dangerous_commands_require_confirmation(self):
         """测试危险命令需要确认"""
-        from deepagents.tools.command import CommandWhitelist
+        from myagent.tools.command import CommandWhitelist
 
         # rm -rf 是危险的
         is_allowed, needs_confirm = CommandWhitelist.is_allowed("rm -rf /tmp/test")

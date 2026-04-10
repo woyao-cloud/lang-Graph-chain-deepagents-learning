@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import os
 
-from deepagents.workflow.parser import WorkflowParser, Workflow, Phase, Task
+from myagent.workflow.parser import WorkflowParser, Workflow, Phase, Task
 
 
 class TestWorkflowParser:

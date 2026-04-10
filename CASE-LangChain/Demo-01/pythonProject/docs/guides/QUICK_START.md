@@ -10,13 +10,13 @@
 ### Step 1: 安装
 
 ```bash
-pip install deepagents click typer
+pip install myagent click typer
 ```
 
 ### Step 2: 初始化项目
 
 ```bash
-python -m deepagents init --name my-code-agent
+python -m myagent init --name my-code-agent
 cd my-code-agent
 ```
 
@@ -39,11 +39,11 @@ cd my-code-agent
 
 ```bash
 # 生成规划
-python -m deepagents run --phase plan
+python -m myagent run --phase plan
 
 # 确认并执行
-python -m deepagents confirm --file PLANNING.md
-python -m deepagents run --phase execute
+python -m myagent confirm --file PLANNING.md
+python -m myagent run --phase execute
 ```
 
 ---
@@ -91,13 +91,13 @@ python -m deepagents run --phase execute
 
 | 命令 | 说明 |
 |------|------|
-| `deepagents init --name xxx` | 初始化项目 |
-| `deepagents run --phase plan` | 生成规划 |
-| `deepagents confirm` | 确认规划 |
-| `deepagents run --phase execute` | 执行任务 |
-| `deepagents status` | 查看状态 |
-| `deepagents logs --agent xxx` | 查看日志 |
-| `deepagents skip --task xxx` | 跳过任务 |
+| `myagent init --name xxx` | 初始化项目 |
+| `myagent run --phase plan` | 生成规划 |
+| `myagent confirm` | 确认规划 |
+| `myagent run --phase execute` | 执行任务 |
+| `myagent status` | 查看状态 |
+| `myagent logs --agent xxx` | 查看日志 |
+| `myagent skip --task xxx` | 跳过任务 |
 
 ---
 

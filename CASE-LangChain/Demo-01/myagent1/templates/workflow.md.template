@@ -1,0 +1,21 @@
+# Workflow Configuration
+
+## Phases
+
+- [Phase 1] 需求分析与架构设计 (depends: none)
+  - Task: 架构设计 (parallel: false, owner: architect)
+
+- [Phase 2] 核心模块开发 (depends: Phase 1)
+  - Task: 模块开发 (parallel: true, owner: backend-dev, frontend-dev)
+
+- [Phase 3] 集成与测试 (depends: Phase 2)
+  - Task: 集成测试 (parallel: false, owner: qa-engineer)
+
+- [Phase 4] 部署与交付 (depends: Phase 3)
+  - Task: 部署 (parallel: false, owner: devops)
+
+## Rules
+
+- 每阶段输出必须通过自动化校验（Lint/Test）
+- 并行任务需使用独立命名空间，避免文件冲突
+- 所有变更需自动生成 Commit Message 并推送至 Feature Branch
