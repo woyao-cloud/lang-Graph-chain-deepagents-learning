@@ -23,7 +23,15 @@ class LLMConfig:
         """Load configuration from environment variables."""
         provider = os.getenv("MYAGENT_LLM_PROVIDER", "anthropic")
         model = os.getenv("MYAGENT_LLM_MODEL", "claude-sonnet-4-6")
-        api_key = os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")
+
+        # Get API key based on provider
+        if provider == "anthropic":
+            api_key = os.getenv("ANTHROPIC_API_KEY")
+        elif provider == "openai":
+            api_key = os.getenv("OPENAI_API_KEY")
+        else:
+            api_key = None
+
         base_url = os.getenv("MYAGENT_LLM_BASE_URL")
         return cls(
             provider=provider,

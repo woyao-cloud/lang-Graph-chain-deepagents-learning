@@ -5,7 +5,7 @@ Executes tasks using DeepAgents.
 
 from __future__ import annotations
 
-import pickle
+import json
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -44,16 +44,17 @@ class Checkpoint:
         Returns:
             Checkpoint ID
         """
-        checkpoint_id = f"{phase_index}_{task_name}_{int(time.time())}"
-        checkpoint_file = self.checkpoint_dir / f"{checkpoint_id}.pkl"
+        import uuid
+        checkpoint_id = f"{phase_index}_{task_name}_{int(time.time() * 1000)}_{uuid.uuid4().hex[:8]}"
+        checkpoint_file = self.checkpoint_dir / f"{checkpoint_id}.json"
 
-        with open(checkpoint_file, "wb") as f:
-            pickle.dump({
+        with open(checkpoint_file, "w", encoding="utf-8") as f:
+            json.dump({
                 "task_name": task_name,
                 "phase_index": phase_index,
                 "state": state,
                 "timestamp": time.time(),
-            }, f)
+            }, f, ensure_ascii=False, indent=2)
 
         return checkpoint_id
 
@@ -66,12 +67,12 @@ class Checkpoint:
         Returns:
             State dict or None if not found
         """
-        checkpoint_file = self.checkpoint_dir / f"{checkpoint_id}.pkl"
+        checkpoint_file = self.checkpoint_dir / f"{checkpoint_id}.json"
         if not checkpoint_file.exists():
             return None
 
-        with open(checkpoint_file, "rb") as f:
-            return pickle.load(f)
+        with open(checkpoint_file, "r", encoding="utf-8") as f:
+            return json.load(f)
 
     def get_latest(self, task_name: str | None = None) -> str | None:
         """Get latest checkpoint.
@@ -82,7 +83,7 @@ class Checkpoint:
         Returns:
             Latest checkpoint ID or None
         """
-        checkpoints = list(self.checkpoint_dir.glob("*.pkl"))
+        checkpoints = list(self.checkpoint_dir.glob("*.json"))
         if not checkpoints:
             return None
 
@@ -164,8 +165,11 @@ class TaskRunner:
             if latest:
                 saved_state = self.checkpoint.load(latest)
                 if saved_state:
-                    # Resume from checkpoint
-                    context = {**saved_state["state"], **context}
+                    # Merge context properly: saved state takes precedence for saved keys
+                    # but we preserve any new runtime context
+                    saved_context = saved_state["state"].get("context", {})
+                    checkpoint_state = {k: v for k, v in saved_state["state"].items() if k != "context"}
+                    context = {**context, **saved_context, **checkpoint_state}
 
         try:
             # Execute task using DeepAgents

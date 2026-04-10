@@ -5,8 +5,11 @@ Provides integration with DeepAgents framework for task execution.
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import TYPE_CHECKING, Any
+
+logger = logging.getLogger(__name__)
 
 try:
     from deepagents import create_deep_agent
@@ -20,6 +23,19 @@ except ImportError:
 if TYPE_CHECKING:
     from langchain_core.language_models import BaseChatModel
     from langchain_core.messages import BaseMessage
+
+
+def require_deepagents() -> None:
+    """Check if DeepAgents is available, raise ImportError if not.
+
+    Raises:
+        ImportError: If deepagents or langchain dependencies are not installed
+    """
+    if not DEEPAGENTS_AVAILABLE:
+        raise ImportError(
+            "deepagents or langchain dependencies are not installed. "
+            "Install with: pip install deepagents langchain-anthropic langchain-openai"
+        )
 
 
 class LLMProvider:
@@ -138,8 +154,7 @@ Be thorough. Focus on:
         Returns:
             DeepAgent instance or None
         """
-        if not DEEPAGENTS_AVAILABLE or not create_deep_agent:
-            return None
+        require_deepagents()
 
         if role in self._agents:
             return self._agents[role]
@@ -156,7 +171,7 @@ Be thorough. Focus on:
             self._agents[role] = agent
             return agent
         except Exception as e:
-            print(f"[DeepAgentFactory] Failed to create agent '{role}': {e}")
+            logger.error(f"Failed to create agent '{role}': {e}")
             return None
 
     def get_default_tools(self) -> list:

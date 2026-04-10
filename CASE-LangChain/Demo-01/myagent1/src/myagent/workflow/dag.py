@@ -32,11 +32,22 @@ class DAG:
         self.nodes[node.id] = node
 
     def add_edge(self, from_id: str, to_id: str) -> None:
-        """Add a directed edge from -> to."""
-        if from_id in self.nodes:
-            self.nodes[from_id].dependents.append(to_id)
-        if to_id in self.nodes:
-            self.nodes[to_id].dependencies.append(from_id)
+        """Add a directed edge from -> to.
+
+        Args:
+            from_id: Source node ID
+            to_id: Target node ID
+
+        Raises:
+            ValueError: If either node doesn't exist in the DAG
+        """
+        if from_id not in self.nodes:
+            raise ValueError(f"Source node '{from_id}' not found in DAG")
+        if to_id not in self.nodes:
+            raise ValueError(f"Target node '{to_id}' not found in DAG")
+
+        self.nodes[from_id].dependents.append(to_id)
+        self.nodes[to_id].dependencies.append(from_id)
 
     def get_parallel_tasks(self) -> list[str]:
         """Get task IDs that can be executed in parallel.
@@ -144,7 +155,12 @@ class DAGBuilder:
                 # Find phase by name or index
                 dep_id = self._find_phase_id(workflow, dep)
                 if dep_id:
-                    dag.add_edge(dep_id, phase_id)
+                    try:
+                        dag.add_edge(dep_id, phase_id)
+                    except ValueError as e:
+                        raise ValueError(
+                            f"Invalid phase dependency in '{phase.name}': {e}"
+                        ) from e
 
         # Add task nodes and edges
         for phase in workflow.phases:

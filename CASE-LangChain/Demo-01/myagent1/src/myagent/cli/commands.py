@@ -351,10 +351,14 @@ def skip_task(project_path: Path, task: str) -> None:
     Args:
         project_path: Path to the project directory
         task: Task name to skip
+
+    Raises:
+        NotImplementedError: Feature not yet implemented
     """
-    print(f"[MyAgent] Skipping task: {task}")
-    # TODO: Implement skip logic
-    print("[MyAgent] Skip task not yet implemented.")
+    raise NotImplementedError(
+        f"skip_task is not yet implemented. "
+        f"Project: {project_path}, Task: {task}"
+    )
 
 
 def rollback_task(project_path: Path, task: str) -> None:
@@ -363,10 +367,14 @@ def rollback_task(project_path: Path, task: str) -> None:
     Args:
         project_path: Path to the project directory
         task: Task name to rollback
+
+    Raises:
+        NotImplementedError: Feature not yet implemented
     """
-    print(f"[MyAgent] Rolling back task: {task}")
-    # TODO: Implement rollback logic
-    print("[MyAgent] Rollback task not yet implemented.")
+    raise NotImplementedError(
+        f"rollback_task is not yet implemented. "
+        f"Project: {project_path}, Task: {task}"
+    )
 
 
 def approve_operation(project_path: Path, operation: str) -> None:
@@ -375,10 +383,14 @@ def approve_operation(project_path: Path, operation: str) -> None:
     Args:
         project_path: Path to the project directory
         operation: Operation ID to approve
+
+    Raises:
+        NotImplementedError: Feature not yet implemented
     """
-    print(f"[MyAgent] Approving operation: {operation}")
-    # TODO: Implement approval logic
-    print("[MyAgent] Approve operation not yet implemented.")
+    raise NotImplementedError(
+        f"approve_operation is not yet implemented. "
+        f"Project: {project_path}, Operation: {operation}"
+    )
 
 
 def reject_operation(project_path: Path, operation: str) -> None:
@@ -387,10 +399,14 @@ def reject_operation(project_path: Path, operation: str) -> None:
     Args:
         project_path: Path to the project directory
         operation: Operation ID to reject
+
+    Raises:
+        NotImplementedError: Feature not yet implemented
     """
-    print(f"[MyAgent] Rejecting operation: {operation}")
-    # TODO: Implement rejection logic
-    print("[MyAgent] Reject operation not yet implemented.")
+    raise NotImplementedError(
+        f"reject_operation is not yet implemented. "
+        f"Project: {project_path}, Operation: {operation}"
+    )
 
 
 # Default templates
