@@ -66,7 +66,7 @@ Optional:
 ```
 LANGCHAIN_TRACING_V2=true
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
-LANGCHAIN_API_KEY=your_langsmith_api_key_here
+LANGCHAIN_API_KEY=your_th_api_key_here
 LANGCHAIN_PROJECT=text2sql-deepagent
 ```
 
