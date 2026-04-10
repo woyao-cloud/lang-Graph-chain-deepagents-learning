@@ -2,7 +2,7 @@
 
 ## Phases
 
-- [Phase 1] Requirements Analysis (depends: none)
+- [Phase 1] Implement a web Snake game with React.js, Requirements Analysis (depends: none)
   - Task: Architecture Design (parallel: false, owner: architect)
 
 - [Phase 2] Core Module Development (depends: Phase 1)

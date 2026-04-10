@@ -1,27 +1,25 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "myagent"
-version = "0.1.0"
-description = "MyCodeAgent - 全自动化、可解释、可干预的工程级代码生成系统"
-requires-python = ">=3.11"
-dependencies = [
-    "click>=8.0",
-    "typer>=0.12",
-    "deepagents>=0.5.0",
-    "langchain-openai>=1.0",
-    "langchain-anthropic>=1.0",
-    "langchain-core>=0.3",
-    "langgraph>=0.2",
-    "pylint>=3.0",
-    "pytest>=8.0",
-    "pyyaml>=6.0",
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--no-header",
+    "-q",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.coverage.run]
+source = ["src/myagent"]
+branch = true
+omit = ["*/tests/*", "*/__pycache__/*"]
 
-[project.scripts]
-myagent = "myagent.cli.main:main"
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
+show_missing = true

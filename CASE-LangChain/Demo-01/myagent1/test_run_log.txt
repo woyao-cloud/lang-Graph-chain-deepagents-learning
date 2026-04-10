@@ -1,0 +1,23 @@
+======================================================================
+MYAGENT TEST RUNNER
+======================================================================
+Project: D:\python-projects\langchain\CASE-LangChain\Demo-01\myagent1
+Python: D:\python-projects\langchain\CASE-LangChain\Demo-01\myagent1\venv\Scripts\python.exe
+CWD: D:\python-projects\langchain\CASE-LangChain\Demo-01\myagent1
+
+Test files:
+  Found 8 test files
+  - test_agent_registry.py
+  - test_config.py
+  - test_deep_integration.py
+  - test_models.py
+  - test_planning_doc_generator.py
+  - test_task_runner.py
+  - test_workflow_dag.py
+  - test_workflow_parser.py
+
+Running pytest...
+  pytest version: 9.0.3
+
+Pytest exit code: 1
+TESTS FAILED (code 1)

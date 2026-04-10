@@ -139,7 +139,7 @@ class ConfirmationGate:
         if not path.exists():
             return False
 
-        content = path.read_text(encoding="utf-8")
+        content = path.read_text(encoding="utf-8", errors="ignore")
 
         # Check for confirmation markers
         patterns = [
