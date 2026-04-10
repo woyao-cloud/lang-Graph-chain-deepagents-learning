@@ -24,4 +24,4 @@ dependencies = [
 where = ["src"]
 
 [project.scripts]
-myagent = "myagent.cli:main"
+myagent = "myagent.cli.main:main"
