@@ -109,9 +109,36 @@ class TaskRunner:
         """
         self.config = config
         self.checkpoint: Checkpoint | None = None
+        self._executor = None
 
         if config:
             self.checkpoint = Checkpoint(config.workflow.logs_dir / "checkpoints")
+
+    def _get_executor(self) -> Any:
+        """Get or create the agent executor.
+
+        Returns:
+            AgentExecutor instance
+        """
+        if self._executor is None:
+            from myagent.agents.deep_integration import AgentExecutor
+
+            provider = "anthropic"
+            api_key = None
+            model = None
+
+            if self.config:
+                provider = self.config.llm.provider
+                api_key = self.config.llm.api_key
+                model = self.config.llm.model
+
+            self._executor = AgentExecutor(
+                provider=provider,
+                api_key=api_key,
+                model=model,
+            )
+
+        return self._executor
 
     def execute(
         self,
@@ -141,29 +168,42 @@ class TaskRunner:
                     context = {**saved_state["state"], **context}
 
         try:
-            # Execute task
-            # In real implementation, this would use DeepAgents
-            result = self._do_execute(task, context)
+            # Execute task using DeepAgents
+            executor = self._get_executor()
+            role = task.owner[0] if task.owner else "architect"
+
+            result = executor.execute_task(
+                task=f"Execute task: {task.name}",
+                role=role,
+                context=context,
+            )
 
             end_time = time.time()
+            duration = end_time - start_time
+
+            success = result.get("success", False)
+            output = str(result.get("result", {}))
+            error = result.get("error")
 
             # Save checkpoint on success
-            if self.checkpoint:
+            if success and self.checkpoint:
                 self.checkpoint.save(task.name, phase_index, {
                     "status": "completed",
-                    "result": result,
+                    "result": output,
                 })
 
             return ExecutionResult(
                 task_name=task.name,
-                agent_name=",".join(task.owner) if task.owner else "unknown",
-                success=True,
-                output=str(result),
-                duration_seconds=end_time - start_time,
+                agent_name=role,
+                success=success,
+                output=output,
+                error=error,
+                duration_seconds=duration,
             )
 
         except Exception as e:
             end_time = time.time()
+            duration = end_time - start_time
 
             # Save checkpoint on failure
             if self.checkpoint:
@@ -174,37 +214,11 @@ class TaskRunner:
 
             return ExecutionResult(
                 task_name=task.name,
-                agent_name=",".join(task.owner) if task.owner else "unknown",
+                agent_name=task.owner[0] if task.owner else "unknown",
                 success=False,
                 error=str(e),
-                duration_seconds=end_time - start_time,
+                duration_seconds=duration,
             )
-
-    def _do_execute(
-        self,
-        task: Task,
-        context: dict[str, Any],
-    ) -> Any:
-        """Actually execute the task.
-
-        This is a placeholder that would use DeepAgents in real implementation.
-
-        Args:
-            task: Task to execute
-            context: Execution context
-
-        Returns:
-            Execution result
-        """
-        # Simulate execution
-        import time
-        time.sleep(0.1)
-
-        return {
-            "task": task.name,
-            "status": "completed",
-            "context": context,
-        }
 
     def resume(self, checkpoint_id: str | None = None) -> ExecutionResult | None:
         """Resume from checkpoint.
@@ -229,7 +243,6 @@ class TaskRunner:
             return None
 
         # Re-execute with saved state
-        # This is a simplified resume - real implementation would be more complex
         return ExecutionResult(
             task_name=saved_state["task_name"],
             agent_name="unknown",

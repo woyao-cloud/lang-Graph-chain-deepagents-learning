@@ -129,18 +129,139 @@ def run_phase(
         print("[MyAgent] Review PLANNING.md and run 'myagent confirm' to proceed.")
 
     elif phase == "execute":
-        if resume:
-            print("[MyAgent] Resuming from checkpoint...")
-            # TODO: Implement checkpoint resume
-            print("[MyAgent] Resume not yet implemented.")
-
         print(f"[MyAgent] Starting execution phase (parallel={parallel})...")
 
         if watch:
             print("[MyAgent] Press Ctrl+C to interrupt. Use 'myagent status --live' to monitor.")
 
-        # TODO: Implement actual execution with DeepAgents
-        print("[MyAgent] Execution not yet implemented.")
+        # Check if planning is confirmed
+        planning_path = project_path / "PLANNING.md"
+        if not planning_path.exists():
+            print("ERROR: PLANNING.md not found. Run 'myagent run --phase plan' first.")
+            sys.exit(1)
+
+        from myagent.planner.planning_doc_generator import PlanningGenerator
+        generator = PlanningGenerator()
+        planning_doc = generator.load(planning_path)
+
+        if not planning_doc.confirmed:
+            print("ERROR: Planning not confirmed. Run 'myagent confirm --file PLANNING.md' first.")
+            sys.exit(1)
+
+        # Execute workflow using DeepAgents
+        _execute_workflow(workflow, dag, config, parallel)
+
+        print("[MyAgent] Execution complete.")
+
+
+def _execute_workflow(workflow, dag, config, parallel: bool = False) -> None:
+    """Execute workflow using DeepAgents.
+
+    Args:
+        workflow: Workflow model
+        dag: DAG of tasks
+        config: MyAgent config
+        parallel: Enable parallel execution
+    """
+    from myagent.agents.deep_integration import AgentExecutor
+    from myagent.progress.tracker import ProgressTracker
+
+    # Initialize executor and progress tracker
+    executor = AgentExecutor(
+        provider=config.llm.provider,
+        api_key=config.llm.api_key,
+        model=config.llm.model,
+    )
+    tracker = ProgressTracker()
+
+    # Get execution levels (phases that can run)
+    try:
+        levels = dag.get_execution_levels()
+    except ValueError as e:
+        print(f"[MyAgent] DAG error: {e}")
+        return
+
+    print(f"[MyAgent] Executing {len(levels)} phase levels")
+
+    for level_idx, level in enumerate(levels):
+        print(f"\n[MyAgent] Phase Level {level_idx + 1}/{len(levels)}")
+
+        # Find phase nodes in this level
+        phase_nodes = [n for n in level if dag.nodes[n].metadata.get("type") == "phase"]
+        task_nodes = [n for n in level if dag.nodes[n].metadata.get("type") == "task"]
+
+        # Execute phases (sequential)
+        for phase_node_id in phase_nodes:
+            phase_node = dag.nodes[phase_node_id]
+            phase = phase_node.metadata["phase"]
+            print(f"[MyAgent] Starting phase: {phase.name}")
+
+            tracker.start_phase(phase)
+
+            # Execute tasks in phase
+            for task in phase.tasks:
+                print(f"[MyAgent]   Executing task: {task.name} (owner: {', '.join(task.owner) or 'none'})")
+
+                # Update progress
+                tracker.update_task(phase.index, task.name, 0.0)
+
+                # Get role
+                role = task.owner[0] if task.owner else "architect"
+
+                # Execute using DeepAgents
+                try:
+                    result = executor.execute_task(
+                        task=f"Execute task: {task.name}",
+                        role=role,
+                        context={
+                            "phase": phase.name,
+                            "project_root": str(config.project_root),
+                        }
+                    )
+
+                    if result.get("success"):
+                        tracker.update_task(phase.index, task.name, 100.0)
+                        print(f"[MyAgent]     SUCCESS: {task.name}")
+                    else:
+                        tracker.update_task(phase.index, task.name, 0.0, status="failed")
+                        print(f"[MyAgent]     FAILED: {task.name} - {result.get('error', 'Unknown error')}")
+
+                except Exception as e:
+                    tracker.update_task(phase.index, task.name, 0.0, status="failed")
+                    print(f"[MyAgent]     ERROR: {task.name} - {e}")
+
+            tracker.complete_phase(phase.index)
+
+        # Execute standalone tasks (if any)
+        for task_node_id in task_nodes:
+            task_node = dag.nodes[task_node_id]
+            task = task_node.metadata["task"]
+            phase = task_node.metadata.get("phase")
+
+            if phase:
+                continue  # Already executed with phase
+
+            print(f"[MyAgent]   Executing standalone task: {task.name}")
+
+            role = task.owner[0] if task.owner else "architect"
+
+            try:
+                result = executor.execute_task(
+                    task=f"Execute task: {task.name}",
+                    role=role,
+                    context={"project_root": str(config.project_root)}
+                )
+
+                if result.get("success"):
+                    print(f"[MyAgent]     SUCCESS: {task.name}")
+                else:
+                    print(f"[MyAgent]     FAILED: {task.name}")
+
+            except Exception as e:
+                print(f"[MyAgent]     ERROR: {task.name} - {e}")
+
+    # Generate status report
+    print(f"\n[MyAgent] Overall progress: {tracker.get_overall_progress():.1f}%")
 
 
 def confirm_planning(project_path: Path, planning_file: str, revise: bool = False) -> None:
