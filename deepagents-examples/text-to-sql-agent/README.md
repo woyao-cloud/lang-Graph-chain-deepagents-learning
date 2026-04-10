@@ -31,7 +31,7 @@ Uses the [Chinook database](https://github.com/lerocha/chinook-database) - a sam
 git clone https://github.com/langchain-ai/deepagents.git
 cd deepagents/examples/text-to-sql-agent
 ```
-
+pip install langchain_openai
 1. Download the Chinook database:
 
 ```bash

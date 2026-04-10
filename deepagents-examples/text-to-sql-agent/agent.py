@@ -5,7 +5,8 @@ import sys
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from dotenv import load_dotenv
-from langchain_anthropic import ChatAnthropic
+#from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_community.utilities import SQLDatabase
 from rich.console import Console
@@ -22,21 +23,27 @@ def create_sql_deep_agent():
 
     # Get base directory
     base_dir = os.path.dirname(os.path.abspath(__file__))
-
+    api_key = os.getenv("OPENAI_API_KEY", "sk-723b202be3804cd89fef3970bc92675f")
+    api_base = os.getenv("OPENAI_API_BASE", "https://dashscope.aliyuncs.com/compatible-mode/v1")
     # Connect to Chinook database
     db_path = os.path.join(base_dir, "chinook.db")
     db = SQLDatabase.from_uri(f"sqlite:///{db_path}", sample_rows_in_table_info=3)
 
     # Initialize Claude Sonnet 4.5 for toolkit initialization
-    model = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0)
-
+    # model = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0)
+    model = ChatOpenAI(
+        api_key=api_key,
+        base_url=api_base,  # 指向 DashScope 的 OpenAI 兼容 URL
+        model="deepseek-v3.2-exp",  # 或 "qwen-turbo" / 您有权限的模型名qwen3-max qwen-max deepseek-v3.2-exp
+        temperature=0.2
+    )
     # Create SQL toolkit and get tools
     toolkit = SQLDatabaseToolkit(db=db, llm=model)
     sql_tools = toolkit.get_tools()
 
     # Create the Deep Agent with all parameters
     agent = create_deep_agent(
-        model=model,  # Claude Sonnet 4.5 with temperature=0
+        model=model,  #
         memory=["./AGENTS.md"],  # Agent identity and general instructions
         skills=[
             "./skills/"
