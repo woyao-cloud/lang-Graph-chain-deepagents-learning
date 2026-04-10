@@ -5,6 +5,10 @@ import sys
 import os
 import shutil
 
+# Set Ollama environment BEFORE importing myagent modules llama2
+os.environ['MYAGENT_LLM_PROVIDER'] = 'ollama'
+os.environ['MYAGENT_LLM_MODEL'] = 'minimax-m2.7:cloud'
+
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
