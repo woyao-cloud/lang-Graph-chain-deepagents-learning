@@ -49,6 +49,6 @@ agent = create_deep_agent(
 )
 
 # 调用 agent
-result = agent.invoke({"messages": [{"role": "user", "content": "What is LangGraph?"}]})
+result = agent.invoke({"messages": [{"role": "user", "content": "What is LangGraph? 输出中文"}]})
 
 print(result["messages"][-1].content)
