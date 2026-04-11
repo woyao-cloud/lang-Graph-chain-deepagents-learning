@@ -6,8 +6,8 @@ for conducting web research with strategic thinking and context management.
 import os
 from datetime import datetime
 
-from langchain.chat_models import init_chat_model
-from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain.chat_models import init_chat_model
+# from langchain_google_genai import ChatGoogleGenerativeAI
 from deepagents import create_deep_agent
 from langchain_openai import ChatOpenAI
 
@@ -17,8 +17,10 @@ from research_agent.prompts import (
     SUBAGENT_DELEGATION_INSTRUCTIONS,
 )
 from research_agent.tools import tavily_search, think_tool
-
-api_key = os.getenv("OPENAI_API_KEY", "sk-723b202be3804cd89fef3970bc92675f")
+from rich.console import Console
+from rich.panel import Panel
+console = Console()
+api_key = os.getenv("OPENAI_API_KEY")
 api_base = os.getenv("OPENAI_API_BASE", "https://dashscope.aliyuncs.com/compatible-mode/v1")
 # Limits
 max_concurrent_research_units = 3
@@ -52,12 +54,19 @@ research_sub_agent = {
 
 # Model Claude 4.5
 # model = # init_chat_model(model="anthropic:claude-sonnet-4-5-20250929", temperature=0.0)
+# Model Gemini 3 
+# model = ChatGoogleGenerativeAI(model="gemini-3-pro-preview", temperature=0.0)
+
+# Model Claude 4.5
+# model = # init_chat_model(model="anthropic:claude-sonnet-4-5-20250929", temperature=0.0)
 model = ChatOpenAI(
     api_key=api_key,
     base_url=api_base,    # 指向 DashScope 的 OpenAI 兼容 URL
     model="qwen-max",     # 或 "qwen-turbo" / 您有权限的模型名
     temperature=0.2
 )
+
+
 # Create the agent
 agent = create_deep_agent(
     model=model,
@@ -65,3 +74,34 @@ agent = create_deep_agent(
     system_prompt=INSTRUCTIONS,
     subagents=[research_sub_agent],
 )
+
+
+def main():
+    import sys
+    if len(sys.argv) < 2:
+        print('用法: python agent.py "topic"')
+        sys.exit(1)
+    topic = sys.argv[1]
+    console.print(Panel(f"[bold blue]研究主题:[/bold blue]\n\n{topic}", border_style="blue"))
+
+    try:
+        # invoke expects a mapping like {"messages": [...]}
+        result = agent.invoke({"messages": [{"role": "user", "content": topic}]})
+
+        # Extract and display the final answer (last message)
+        messages = result.get("messages", [])
+        if not messages:
+            console.print(Panel(f"[bold yellow]No messages returned from agent.[/bold yellow]", border_style="yellow"))
+            sys.exit(1)
+        final_message = messages[-1]
+        answer = getattr(final_message, "content", str(final_message))
+
+        console.print(Panel(f"[bold green]Answer:[/bold green]\n\n{answer}", border_style="green"))
+
+    except Exception as e:
+        console.print(Panel(f"[bold red]Error:[/bold red]\n\n{str(e)}", border_style="red"))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
